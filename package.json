@@ -1,7 +1,7 @@
 {
   "name": "whitelabelcrypto",
   "version": "0.1.0",
-  "homepage": "https://longnk1301.github.io/react-gh-pages",
+  "homepage": "https://longnk1301.github.io/white-label-crypto",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.6",
