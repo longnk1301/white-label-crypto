@@ -1,5 +1,4 @@
 import { Box, Stack } from '@mui/material';
-import TextIcon from '../../components/TextIcon';
 import ButtonIcon from '../../components/ButtonIcon';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
