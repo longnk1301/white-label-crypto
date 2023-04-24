@@ -1,29 +1,65 @@
+import { useWeb3React } from '@web3-react/core';
 import { Box, Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Metamask from '../../assets/metamask.png';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-    shortAddress,
-    useAccount,
-    useWeb3,
-} from '../../contexts/web3-provider';
+import { injected } from '../../config/wallet';
 
 const Header = () => {
-    const { account } = useAccount();
-    const { connect, disconnect } = useWeb3();
+    const { account, activate, deactivate } =
+        useWeb3React();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
+    const shortAddress = (address: string) => {
+        return address != null
+            ? address?.substr(0, 7) + '...' + address?.substr(-4)
+            : undefined;
+    };
+
+    async function connect() {
+        try {
+            await activate(injected);
+            localStorage.setItem('isWalletConnected', `true`);
+        } catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    async function disconnect() {
+        try {
+            deactivate();
+            localStorage.setItem('isWalletConnected', `false`);
+        } catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    useEffect(() => {
+        const connectWalletOnPageLoad = async () => {
+            if (localStorage?.getItem('isWalletConnected') === 'true') {
+                try {
+                    await activate(injected);
+                    localStorage.setItem('isWalletConnected', `true`);
+                } catch (ex) {
+                    console.log(ex);
+                }
+            }
+        };
+        connectWalletOnPageLoad();
+    }, []);
+
     const handleClose = () => {
         setAnchorEl(null);
     };
 
     const handleDisconnect = () => {
-        disconnect && disconnect();
+        disconnect();
         handleClose();
     };
 
