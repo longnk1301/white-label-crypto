@@ -74,7 +74,9 @@ const CreateToken = () => {
   console.log('state, ', state);
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: '#F7FAFF' }}>
+      <Box pl={5} pr={5}>
       <Header />
+      </Box>
       <Box display="flex" flex={1} p={5}>
         <span style={{ fontSize: 24, fontWeight: 500 }}>
           Create {state.tokenType} token
