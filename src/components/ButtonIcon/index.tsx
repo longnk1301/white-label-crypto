@@ -5,11 +5,13 @@ const ButtonIcon = ({
   text,
   selected,
   onCLick,
+  disabled = false,
 }: {
   icon?: any;
   text: string;
   selected?: boolean;
   onCLick?: () => void;
+  disabled?: boolean;
 }) => {
   return (
     <Button
@@ -34,6 +36,7 @@ const ButtonIcon = ({
       variant="text"
       startIcon={icon}
       onClick={onCLick}
+      disabled={disabled}
     >
       {text}
     </Button>

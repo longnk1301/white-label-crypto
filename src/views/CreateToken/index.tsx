@@ -56,14 +56,13 @@ const CreateToken = () => {
   };
 
   function _handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log('111', e.target.name, e.target.value);
-    console.log('222', e.target.checked);
     if (e.target.name === 'decimals') {
       if (Number(e.target.value) >= 0 && Number(e.target.value) <= 18) {
         setState({ ...state, [e.target.name]: Number(e.target.value) });
       }
       return;
     }
+
     if (flags.includes(e.target.name)) {
       setState({ ...state, [e.target.name]: e.target.checked });
 
@@ -258,7 +257,12 @@ const CreateToken = () => {
             </Box>
             <Box p={1} pt={5} display={'flex'} flexDirection={'row'}>
               <Button
-                disabled={state.tokenName === '' && state.symbol === ''}
+                disabled={
+                  state.tokenName === '' &&
+                  state.symbol === '' &&
+                  state.initialSupply === 0 &&
+                  state.decimals === 0
+                }
                 sx={{
                   width: 159,
                   maxWidth: 159,

@@ -19,11 +19,6 @@ const Left = ({
 }) => {
   return (
     <Box>
-      <TextIcon text={'Simple, fast and convenient token generator'} />
-      <TextIcon text={'No smart contract programming required'} />
-      <TextIcon text={'Get 100% ownership of generated tokens'} />
-      <TextIcon text={'Set custom token name, symbol and initial supply'} />
-      <TextIcon text={'Sign and create with your own wallet'} />
       <Box mt={5} width={335}>
         <Stack spacing={2} mb={2} direction="row">
           <ButtonIcon
@@ -33,6 +28,7 @@ const Left = ({
             onCLick={() => handleSetState('Ethereum')}
           />
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'Avalanche'}
             icon={<CurrencyExchangeIcon />}
             text="Avalanche"
@@ -41,12 +37,14 @@ const Left = ({
         </Stack>
         <Stack spacing={2} mb={2} direction="row">
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'Polygon'}
             icon={<CurrencyFrancIcon />}
             text="Polygon"
             onCLick={() => handleSetState('Polygon')}
           />
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'BSC'}
             icon={<CurrencyRubleIcon />}
             text="BSC"
@@ -55,12 +53,14 @@ const Left = ({
         </Stack>
         <Stack spacing={2} mb={2} direction="row">
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'Fantom'}
             icon={<MonetizationOnIcon />}
             text="Fantom"
             onCLick={() => handleSetState('Fantom')}
           />
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'Arbitrum'}
             icon={<EuroSymbolIcon />}
             text="Arbitrum"
@@ -69,6 +69,7 @@ const Left = ({
         </Stack>
         <Stack spacing={2} mb={2} direction="row">
           <ButtonIcon
+            disabled
             selected={state.tokenType === 'Optimism'}
             icon={<CurrencyLiraIcon />}
             text="Optimism"
