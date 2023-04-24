@@ -39,6 +39,15 @@ const Header = () => {
         }
     }
 
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDisconnect = () => {
+        disconnect();
+        handleClose();
+    };
+
     useEffect(() => {
         const connectWalletOnPageLoad = async () => {
             if (localStorage?.getItem('isWalletConnected') === 'true') {
@@ -53,14 +62,21 @@ const Header = () => {
         connectWalletOnPageLoad();
     }, [activate]);
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    useEffect(() => {
+        const connectWalletOnPageLoad = async () => {
+            if (localStorage?.getItem('isWalletConnected') === 'true') {
+                try {
+                    await activate(injected);
+                    localStorage.setItem('isWalletConnected', `true`);
+                } catch (ex) {
+                    console.log(ex);
+                }
+            }
+        };
 
-    const handleDisconnect = () => {
-        disconnect();
-        handleClose();
-    };
+        connectWalletOnPageLoad();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const renderAccount = () => {
         if (account) {
@@ -118,7 +134,7 @@ const Header = () => {
                         }}
                         PaperProps={{
                             style: {
-                                backgroundColor: '#fff', // set your desired background color
+                                backgroundColor: '#fff',
                                 width: 200,
                             },
                         }}
