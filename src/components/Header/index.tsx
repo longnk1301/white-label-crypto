@@ -7,8 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { injected } from '../../config/wallet';
 
 const Header = () => {
-    const { account, activate, deactivate } =
-        useWeb3React();
+    const { account, activate, deactivate } = useWeb3React();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -52,7 +51,7 @@ const Header = () => {
             }
         };
         connectWalletOnPageLoad();
-    }, []);
+    }, [activate]);
 
     const handleClose = () => {
         setAnchorEl(null);
