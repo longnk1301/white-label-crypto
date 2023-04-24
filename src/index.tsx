@@ -4,10 +4,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Web3ReactProvider } from '@web3-react/core';
-import Web3 from 'web3';
+import { ethers } from "ethers";
 
-function getLibrary(provider: any) {
-    return new Web3(provider);
+declare global {
+    interface Window {
+        ethereum?: any
+    }
+}
+
+async function getLibrary(provider: any) {
+    return await provider.send("eth_requestAccounts", []);
+
 }
 
 const root = ReactDOM.createRoot(

@@ -9,6 +9,7 @@ import CustomCheckBox from '../../components/CustomCheckBox';
 import CustomTooltip from '../../components/CustomTooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button, Typography } from '@mui/material';
+import { ethers, BigNumber } from "ethers";
 
 const flags = [
   'canBurn',
@@ -54,6 +55,28 @@ const CreateToken = () => {
   const handleSetTokenType = (value: string) => {
     setState({ ...state, tokenType: value });
   };
+  const token = require("../../contracts/Token.json");
+  const bytecode = token.bytecode;
+  const abi = token.abi;
+
+  async function createToken() {
+    const nodeUrl = "https://mainnet.infura.io/v3/8437acd102144f1d9df11aaf82073fb3"; // Replace with your own node URL
+// Create a provider instance using the node URL
+    const provider = new ethers.providers.JsonRpcProvider(nodeUrl);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const args = [state.tokenName, state.symbol,  state.initialSupply, state.decimals];
+    const factory = new ethers.ContractFactory(abi, bytecode, signer);
+    const options = {
+      gasLimit: 3000000, // The gas limit for deploying the smart contract (if needed)
+    };
+    // Deploy the smart contract using the contract factory instance
+    const contract = await factory.deploy(...args, options);
+    // Wait for the transaction to be confirmed
+    await contract.deployed();
+    // Log the contract address
+    console.log(contract.address);
+  }
 
   function _handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.name === 'decimals') {
@@ -75,7 +98,7 @@ const CreateToken = () => {
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: '#F7FAFF' }}>
       <Box pl={5} pr={5}>
-      <Header />
+        <Header />
       </Box>
       <Box display="flex" flex={1} p={5}>
         <span style={{ fontSize: 24, fontWeight: 500 }}>
@@ -95,9 +118,9 @@ const CreateToken = () => {
               value={state.tokenName}
               onChange={_handleChange}
               name="tokenName"
-              label="Token name"
-              required
-              placeholder="e.g. Nice Token Name"
+            label="Token name"
+            required
+            placeholder="e.g. Nice Token Name"
             />
             <CustomOutlinedTextField
               value={state.symbol}
@@ -285,9 +308,7 @@ const CreateToken = () => {
                   },
                 }}
                 variant="contained"
-                onClick={() => {
-                  alert(JSON.stringify(state));
-                }}
+                onClick={createToken}
               >
                 Create token
               </Button>
