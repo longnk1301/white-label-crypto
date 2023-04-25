@@ -23,16 +23,21 @@ const Header = () => {
   };
 
   async function connect() {
-    try {
-      await activate(injected);
-      localStorage.setItem('isWalletConnected', `true`);
-    } catch (ex) {
-      console.log(ex);
-    }
-    if (
-      error?.message === 'Already processing eth_requestAccounts. Please wait.'
-    ) {
+    if (!window?.ethereum?.isMetaMask) {
       setIsAlreadyConnect(true);
+    } else {
+      try {
+        await activate(injected);
+        localStorage.setItem('isWalletConnected', `true`);
+      } catch (ex) {
+        console.log(ex);
+      }
+      if (
+        error?.message ===
+        'Already processing eth_requestAccounts. Please wait.'
+      ) {
+        setIsAlreadyConnect(true);
+      }
     }
   }
 
@@ -86,9 +91,11 @@ const Header = () => {
 
   const handleCloseSnackBar = () => {
     setIsAlreadyConnect(false);
-    window.open(
-      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en-US'
-    );
+    if (!window?.ethereum?.isMetaMask) {
+      window.open(
+        'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en-US'
+      );
+    }
   };
 
   const renderAccount = () => {
@@ -108,7 +115,9 @@ const Header = () => {
             severity="error"
             sx={{ width: '100%' }}
           >
-            Please download Metamask first!
+            {!window?.ethereum?.isMetaMask
+              ? 'Please download Metamask first!'
+              : 'Please connect Metamask first!'}
           </Alert>
         </Snackbar>
       );
