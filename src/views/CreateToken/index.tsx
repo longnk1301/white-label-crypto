@@ -48,7 +48,7 @@ export interface ICreateToken {
 }
 
 const CreateToken = () => {
-  const { chainId } = useWeb3React();
+  const { chainId, account } = useWeb3React();
   const [state, setState] = useState<ICreateToken>({
     tokenType: 'Ethereum',
     tokenName: '',
@@ -91,6 +91,7 @@ const CreateToken = () => {
   };
 
   const disabledCreate =
+    !account ||
     state.tokenName === '' ||
     state.symbol === '' ||
     state.initialSupply === 0 ||

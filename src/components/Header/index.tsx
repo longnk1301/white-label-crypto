@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { injected } from '../../config/wallet';
 
 const Header = () => {
-  const { account, activate, deactivate, error } = useWeb3React();
+  const { account, activate, deactivate, error, chainId } = useWeb3React();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [isAlreadyConnect, setIsAlreadyConnect] = useState(false);
@@ -27,6 +27,9 @@ const Header = () => {
       setIsAlreadyConnect(true);
       return;
     } else {
+      if (!chainId) {
+        setIsAlreadyConnect(true);
+      }
       try {
         await activate(injected);
         localStorage.setItem('isWalletConnected', `true`);
@@ -118,6 +121,8 @@ const Header = () => {
           >
             {!window?.ethereum?.isMetaMask
               ? 'Please download Metamask first!'
+              : !chainId
+              ? 'Please connect to Goerli Test Network first!'
               : 'Please connect Metamask first!'}
           </Alert>
         </Snackbar>
