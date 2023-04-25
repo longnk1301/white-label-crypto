@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { Box, Button } from '@mui/material';
+import { Alert, Box, Button, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Metamask from '../../assets/metamask.png';
 import Menu from '@mui/material/Menu';
@@ -7,10 +7,11 @@ import MenuItem from '@mui/material/MenuItem';
 import { injected } from '../../config/wallet';
 
 const Header = () => {
-  const { account, activate, deactivate } = useWeb3React();
-
+  const { account, activate, deactivate, error } = useWeb3React();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [isAlreadyConnect, setIsAlreadyConnect] = useState(false);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -27,6 +28,11 @@ const Header = () => {
       localStorage.setItem('isWalletConnected', `true`);
     } catch (ex) {
       console.log(ex);
+    }
+    if (
+      error?.message === 'Already processing eth_requestAccounts. Please wait.'
+    ) {
+      setIsAlreadyConnect(true);
     }
   }
 
@@ -78,10 +84,39 @@ const Header = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleCloseSnackBar = () => {
+    setIsAlreadyConnect(false);
+    window.open(
+      'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en-US'
+    );
+  };
+
   const renderAccount = () => {
+    if (isAlreadyConnect) {
+      return (
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          open={isAlreadyConnect}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackBar}
+        >
+          <Alert
+            onClose={handleCloseSnackBar}
+            severity="error"
+            sx={{ width: '100%' }}
+          >
+            Please download Metamask first!
+          </Alert>
+        </Snackbar>
+      );
+    }
+
     if (account) {
       return (
-        <>
+        <Box pr={5} pl={5}>
           <Button sx={styles.button} variant="text" onClick={handleClick}>
             <span style={styles.textButton}>{shortAddress(account)}</span>
             <span style={styles.textInline}>
@@ -116,14 +151,16 @@ const Header = () => {
               <span>Disconnect</span>
             </MenuItem>
           </Menu>
-        </>
+        </Box>
       );
     }
 
     return (
-      <Button sx={styles.connectButton} variant="text" onClick={connect}>
-        <span style={styles.connectButtonText}>Connect wallet</span>
-      </Button>
+      <Box pr={5}>
+        <Button sx={styles.connectButton} variant="text" onClick={connect}>
+          <span style={styles.connectButtonText}>Connect wallet</span>
+        </Button>
+      </Box>
     );
   };
 

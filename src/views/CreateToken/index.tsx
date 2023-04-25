@@ -7,8 +7,10 @@ import Left from './Left';
 import CustomCheckBox from '../../components/CustomCheckBox';
 import CustomTooltip from '../../components/CustomTooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Button, Typography } from '@mui/material';
+import { Alert, Button, Snackbar, Typography } from '@mui/material';
 import { createToken } from '../../helpers/createToken';
+import { useWeb3React } from '@web3-react/core';
+import { injected } from '../../config/wallet';
 
 const MIN_DECIMAL = 0;
 const MAX_DECIMAL = 18;
@@ -46,6 +48,7 @@ export interface ICreateToken {
 }
 
 const CreateToken = () => {
+  const { chainId } = useWeb3React();
   const [state, setState] = useState<ICreateToken>({
     tokenType: 'Ethereum',
     tokenName: '',
@@ -53,13 +56,20 @@ const CreateToken = () => {
     initialSupply: 0,
     decimals: 0,
   });
+  const [isShowConnectWithGoerli, setIsShowConnectWithGoerli] = useState(false);
+  const [address, setAddress] = useState<string>('');
+
   const handleSetTokenType = (value: string) => {
     setState({ ...state, tokenType: value });
   };
 
   const handleCreateToken = async () => {
-    const address = await createToken(state);
-    console.log('address', address);
+    if (chainId && injected.supportedChainIds?.includes(chainId)) {
+      const contract = await createToken(state);
+      setAddress(contract.address);
+    } else {
+      setIsShowConnectWithGoerli(true);
+    }
   };
 
   const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,16 +91,19 @@ const CreateToken = () => {
   };
 
   const disabledCreate =
-    state.tokenName === '' &&
-    state.symbol === '' &&
-    state.initialSupply === 0 &&
+    state.tokenName === '' ||
+    state.symbol === '' ||
+    state.initialSupply === 0 ||
     state.decimals === 0;
+
+  const handleCloseSnackBar = () => {
+    setIsShowConnectWithGoerli(false);
+    setAddress('');
+  };
 
   return (
     <Box sx={styles.container}>
-      <Box pl={5} pr={5}>
-        <Header />
-      </Box>
+      <Header />
       <Box display="flex" flex={1} p={5}>
         <span style={styles.title}>Create {state.tokenType} token</span>
       </Box>
@@ -275,6 +288,40 @@ const CreateToken = () => {
           </Box>
         </Grid>
       </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        open={isShowConnectWithGoerli}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackBar}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          Please connect to Goerli Test Network first!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        open={address !== ''}
+        autoHideDuration={null}
+        onClose={handleCloseSnackBar}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          {`Contract was deployed at address ${address}`}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
