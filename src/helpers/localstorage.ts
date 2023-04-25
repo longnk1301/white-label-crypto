@@ -2,12 +2,12 @@ export const localStorageHelper = {
   setItem: (key: string, value: any) => {
     try {
       let valueStringify = value;
-      if (typeof value === "object") {
+      if (typeof value === 'object') {
         valueStringify = JSON.stringify(value);
       }
       localStorage.setItem(key, valueStringify);
     } catch (e) {
-      console.error("Set item localStorage failed.");
+      console.error('Set item localStorage failed.');
     }
   },
   getItem: (key: string, options?: { isObject: boolean }) => {
@@ -24,14 +24,15 @@ export const localStorageHelper = {
         return value;
       }
     } catch (e) {
-      console.log("Get item localStorage failed");
+      console.log('Get item localStorage failed');
     }
   },
   removeItem: (key: string) => {
     localStorage.removeItem(key);
   },
-  // TODO: check token expired
   isLogin: () => {
-    return !!localStorageHelper.getItem(process.env.REACT_APP_ACCESS_TOKEN_KEY!);
+    return !!localStorageHelper.getItem(
+      process.env.REACT_APP_ACCESS_TOKEN_KEY!
+    );
   },
 };

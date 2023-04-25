@@ -8,7 +8,6 @@ import { injected } from '../../config/wallet';
 
 const Header = () => {
   const { account, activate, deactivate } = useWeb3React();
-  console.log('ac', account);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -83,40 +82,9 @@ const Header = () => {
     if (account) {
       return (
         <>
-          <Button
-            sx={{
-              width: 159,
-              maxWidth: 200,
-              height: 48,
-              textTransform: 'none',
-              flex: 1,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 1,
-              fontSize: 15,
-              fontWeight: 'bold',
-              backgroundColor: '#E8F0FF',
-              color: '#6C7483',
-              '&:hover': {
-                backgroundColor: '#E8F0FF',
-                color: '#6C7483',
-              },
-            }}
-            variant="text"
-            onClick={handleClick}
-          >
-            <span
-              style={{
-                fontSize: '14px',
-                fontWeight: 'bold',
-                display: 'inline-block',
-              }}
-            >
-              {shortAddress(account)}
-            </span>
-
-            <span style={{ display: 'flex', alignItems: 'center' }}>
+          <Button sx={styles.button} variant="text" onClick={handleClick}>
+            <span style={styles.textButton}>{shortAddress(account)}</span>
+            <span style={styles.textInline}>
               <img src={Metamask} alt="metamask" width="20" height="20" />
             </span>
           </Button>
@@ -153,35 +121,8 @@ const Header = () => {
     }
 
     return (
-      <Button
-        sx={{
-          width: 159,
-          maxWidth: 200,
-          height: 48,
-          textTransform: 'none',
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          fontSize: 15,
-          fontWeight: 'bold',
-          backgroundColor: '#03A9F4',
-          color: '#ffffff',
-          '&:hover': {
-            backgroundColor: '#03A9F4',
-            color: '#ffffff',
-          },
-        }}
-        variant="text"
-        onClick={connect}
-      >
-        <span
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-          }}
-        >
-          Connect wallet
-        </span>
+      <Button sx={styles.connectButton} variant="text" onClick={connect}>
+        <span style={styles.connectButtonText}>Connect wallet</span>
       </Button>
     );
   };
@@ -201,6 +142,55 @@ const Header = () => {
       {renderAccount()}
     </Box>
   );
+};
+
+const styles = {
+  button: {
+    width: 159,
+    maxWidth: 200,
+    height: 48,
+    textTransform: 'none',
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1,
+    fontSize: 15,
+    fontWeight: 'bold',
+    backgroundColor: '#E8F0FF',
+    color: '#6C7483',
+    '&:hover': {
+      backgroundColor: '#E8F0FF',
+      color: '#6C7483',
+    },
+  },
+  textButton: {
+    fontSize: '14px',
+    fontWeight: 'bold',
+    display: 'inline-block',
+  },
+  textInline: { display: 'flex', alignItems: 'center' },
+  connectButton: {
+    width: 159,
+    maxWidth: 200,
+    height: 48,
+    textTransform: 'none',
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    fontSize: 15,
+    fontWeight: 'bold',
+    backgroundColor: '#03A9F4',
+    color: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#03A9F4',
+      color: '#ffffff',
+    },
+  },
+  connectButtonText: {
+    fontSize: '16px',
+    fontWeight: 'bold',
+  },
 };
 
 export default Header;

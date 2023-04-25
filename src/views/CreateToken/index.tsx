@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Header from '../../components/Header';
-import './style.css';
 import { useState } from 'react';
 import CustomOutlinedTextField from '../../components/CustomOutlinedTextField';
 import Left from './Left';
@@ -10,6 +9,8 @@ import CustomTooltip from '../../components/CustomTooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button, Typography } from '@mui/material';
 import { ethers } from 'ethers';
+
+const GAS_LIMIT = 3000000;
 
 const flags = [
   'canBurn',
@@ -51,7 +52,6 @@ const CreateToken = () => {
     initialSupply: 0,
     decimals: 0,
   });
-
   const handleSetTokenType = (value: string) => {
     setState({ ...state, tokenType: value });
   };
@@ -59,7 +59,7 @@ const CreateToken = () => {
   const bytecode = token.bytecode;
   const abi = token.abi;
 
-  async function createToken() {
+  const createToken = async () => {
     // Create a provider instance using the node URL
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     const signer = provider.getSigner();
@@ -71,20 +71,21 @@ const CreateToken = () => {
     ];
     const factory = new ethers.ContractFactory(abi, bytecode, signer);
     const options = {
-      gasLimit: 3000000, // The gas limit for deploying the smart contract (if needed)
+      gasLimit: GAS_LIMIT, // The gas limit for deploying the smart contract (if needed)
     };
     // Deploy the smart contract using the contract factory instance
     const contract = await factory.deploy(...args, options);
     // Wait for the transaction to be confirmed
     await contract.deployed();
     alert(`Contract was deployed at address ${contract.address}`);
-  }
+  };
 
-  function _handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'decimals') {
       if (Number(e.target.value) >= 0 && Number(e.target.value) <= 18) {
         setState({ ...state, [e.target.name]: Number(e.target.value) });
       }
+
       return;
     }
 
@@ -93,29 +94,30 @@ const CreateToken = () => {
 
       return;
     }
-
     setState({ ...state, [e.target.name]: e.target.value });
-  }
-  console.log('state, ', state);
+  };
+
+  const disabledCreate =
+    state.tokenName === '' &&
+    state.symbol === '' &&
+    state.initialSupply === 0 &&
+    state.decimals === 0;
+
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: '#F7FAFF' }}>
+    <Box sx={styles.container}>
       <Box pl={5} pr={5}>
         <Header />
       </Box>
       <Box display="flex" flex={1} p={5}>
-        <span style={{ fontSize: 24, fontWeight: 500 }}>
-          Create {state.tokenType} token
-        </span>
+        <span style={styles.title}>Create {state.tokenType} token</span>
       </Box>
       <Grid pl={5} pr={5} container flex={1} minHeight="100vh">
-        <Grid textAlign="start" item xs={5} p={5} pt={4} bgcolor={'#ffffff'}>
+        <Grid textAlign="start" item xs={5} p={5} bgcolor={'#ffffff'}>
           <Left state={state} handleSetState={handleSetTokenType} />
         </Grid>
-        <Grid item xs={7} bgcolor={'#ffffff'} padding={5} textAlign="start">
+        <Grid item xs={7} bgcolor={'#ffffff'} p={5} textAlign="start">
           <Box>
-            <p style={{ fontSize: 20, fontWeight: 500, marginTop: 10 }}>
-              Basic settings
-            </p>
+            <p style={styles.subTitleH1}>Basic settings</p>
             <CustomOutlinedTextField
               value={state.tokenName}
               onChange={_handleChange}
@@ -159,9 +161,7 @@ const CreateToken = () => {
               />
             </Box>
             <Box>
-              <p style={{ fontSize: 20, fontWeight: 500 }}>
-                Token configuration
-              </p>
+              <p style={styles.subTitleH1}>Token configuration</p>
               <CustomCheckBox
                 name="canBurn"
                 checked={state.canBurn}
@@ -204,7 +204,6 @@ const CreateToken = () => {
                   onChange={_handleChange}
                   name="changeOwnerValue"
                   label="Owner"
-                  required
                   placeholder="e.g. 0x352b..."
                   helpText="The default owner is the address of the connected wallet. Note: if you change the owner to an address that you don’t control, you will not be able to make any changes to the token after its creation."
                 />
@@ -212,9 +211,7 @@ const CreateToken = () => {
             </Box>
             <Box>
               <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-                <p style={{ fontSize: 20, fontWeight: 500, marginRight: 8 }}>
-                  Security token configuration
-                </p>
+                <p style={styles.subTitle}>Security token configuration</p>
                 <CustomTooltip title="Activation of these features increases the cost of token creation (see Token Tool terms) and may make your token incompatible with some DeFi protocols." />
               </Box>
               <CustomCheckBox
@@ -284,31 +281,8 @@ const CreateToken = () => {
             </Box>
             <Box p={1} pt={5} display={'flex'} flexDirection={'row'}>
               <Button
-                disabled={
-                  state.tokenName === '' &&
-                  state.symbol === '' &&
-                  state.initialSupply === 0 &&
-                  state.decimals === 0
-                }
-                sx={{
-                  width: 159,
-                  maxWidth: 159,
-                  height: 48,
-                  textTransform: 'none',
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'start',
-                  paddingLeft: 4,
-                  fontSize: 15,
-                  fontWeight: 'bold',
-                  backgroundColor: '#03A9F4',
-                  color: '#ffffff',
-                  '&:hover': {
-                    backgroundColor: '#03A9F4',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                  },
-                }}
+                disabled={disabledCreate}
+                sx={styles.createTokenButton}
                 variant="contained"
                 onClick={createToken}
               >
@@ -320,6 +294,32 @@ const CreateToken = () => {
       </Grid>
     </Box>
   );
+};
+
+const styles = {
+  container: { flexGrow: 1, backgroundColor: '#F7FAFF' },
+  title: { fontSize: 24, fontWeight: 500 },
+  subTitleH1: { fontSize: 20, fontWeight: 500 },
+  subTitle: { fontSize: 20, fontWeight: 500, marginRight: 8 },
+  createTokenButton: {
+    width: 159,
+    maxWidth: 159,
+    height: 48,
+    textTransform: 'none',
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'start',
+    paddingLeft: 4,
+    fontSize: 15,
+    fontWeight: 'bold',
+    backgroundColor: '#03A9F4',
+    color: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#03A9F4',
+      color: '#ffffff',
+      cursor: 'pointer',
+    },
+  },
 };
 
 export default CreateToken;
