@@ -8,9 +8,10 @@ import CustomCheckBox from '../../components/CustomCheckBox';
 import CustomTooltip from '../../components/CustomTooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button, Typography } from '@mui/material';
-import { ethers } from 'ethers';
+import { createToken } from '../../helpers/createToken';
 
-const GAS_LIMIT = 3000000;
+const MIN_DECIMAL = 0;
+const MAX_DECIMAL = 18;
 
 const flags = [
   'canBurn',
@@ -55,43 +56,25 @@ const CreateToken = () => {
   const handleSetTokenType = (value: string) => {
     setState({ ...state, tokenType: value });
   };
-  const token = require('../../contracts/Token.json');
-  const bytecode = token.bytecode;
-  const abi = token.abi;
 
-  const createToken = async () => {
-    // Create a provider instance using the node URL
-    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-    const signer = provider.getSigner();
-    const args = [
-      state.tokenName,
-      state.symbol,
-      state.initialSupply,
-      state.decimals,
-    ];
-    const factory = new ethers.ContractFactory(abi, bytecode, signer);
-    const options = {
-      gasLimit: GAS_LIMIT, // The gas limit for deploying the smart contract (if needed)
-    };
-    // Deploy the smart contract using the contract factory instance
-    const contract = await factory.deploy(...args, options);
-    // Wait for the transaction to be confirmed
-    await contract.deployed();
-    alert(`Contract was deployed at address ${contract.address}`);
+  const handleCreateToken = async () => {
+    const address = await createToken(state);
+    console.log('address', address);
   };
 
   const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'decimals') {
-      if (Number(e.target.value) >= 0 && Number(e.target.value) <= 18) {
+      if (
+        Number(e.target.value) >= MIN_DECIMAL &&
+        Number(e.target.value) <= MAX_DECIMAL
+      ) {
         setState({ ...state, [e.target.name]: Number(e.target.value) });
       }
-
       return;
     }
 
     if (flags.includes(e.target.name)) {
       setState({ ...state, [e.target.name]: e.target.checked });
-
       return;
     }
     setState({ ...state, [e.target.name]: e.target.value });
@@ -284,7 +267,7 @@ const CreateToken = () => {
                 disabled={disabledCreate}
                 sx={styles.createTokenButton}
                 variant="contained"
-                onClick={createToken}
+                onClick={handleCreateToken}
               >
                 Create token
               </Button>
