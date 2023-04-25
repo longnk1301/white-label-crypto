@@ -25,6 +25,7 @@ const Header = () => {
   async function connect() {
     if (!window?.ethereum?.isMetaMask) {
       setIsAlreadyConnect(true);
+      return;
     } else {
       try {
         await activate(injected);
